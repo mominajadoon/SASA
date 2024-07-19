@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 const sendEmailOtp = require("../Mails/nodemailer");
 
 exports.register = async (req, res) => {
+  const provider = "credentials";
+
   const { email, password } = req.body;
   try {
     const existingUser = await User.findOne({ email });
@@ -15,6 +17,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
+      provider,
       email,
       password: hashedPassword,
       isVerified: false,

@@ -44,7 +44,13 @@ router.get(
   passport.authenticate("google", {
     successRedirect: process.env.CLIENT_URL,
     failureRedirect: "/login/failed",
-  })
+  }),
+  (req, res) => {
+    if (req.user) {
+      const { accessToken } = req.user;
+      res.json({ accessToken });
+    }
+  }
 );
 
 router.get("/logout", (req, res) => {
