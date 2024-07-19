@@ -2,16 +2,19 @@ const dotenv = require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./Config/db");
-
+require("./Routes/passport");
 const passport = require("passport");
 const cookieSession = require("cookie-session");
+const mongoose = require("mongoose");
 
 const authRoutes = require("./Routes/userRoutes");
+const productRoutes = require("./Routes/productsRoutes");
+const projectRoutes = require("./Routes/projectRoutes");
 
 // Connect to the database
 connectDB();
 
-// Initialinzing Express App
+// Initializing Express App
 const app = express();
 
 // Middleware to parse JSON requests
@@ -39,6 +42,12 @@ app.use(
 
 // Routes
 app.use("/auth", authRoutes);
+
+// Routes
+app.use("/product", productRoutes);
+
+// Routes
+app.use("/projects", projectRoutes);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));

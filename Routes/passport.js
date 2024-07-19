@@ -1,12 +1,14 @@
 const passport = require("passport");
-var GoogleStrategy = require("passport-google-oauth20").Strategy;
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/auth/google/callback",
+      // callbackURL: "http://localhost:3000/auth/google/callback",
+      callbackURL:
+        "https://sasa-business-listing-app-f231d83a4bc5.herokuapp.com/auth/google/callback",
       scope: ["profile", "email"],
     },
     function (accessToken, refreshToken, profile, callback) {
@@ -24,3 +26,5 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((user, done) => {
   done(null, user);
 });
+
+module.exports = passport;
