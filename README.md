@@ -6,3 +6,4 @@
 
 - After that you can view logs using
   heroku logs --tail
+  //jhj
