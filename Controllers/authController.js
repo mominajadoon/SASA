@@ -7,7 +7,7 @@ const sendEmailOtp = require("../Mails/nodemailer");
 exports.register = async (req, res) => {
   const provider = "credentials";
 
-  const { email, password } = req.body;
+  const { username, email, password } = req.body;
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -18,6 +18,7 @@ exports.register = async (req, res) => {
 
     const user = new User({
       provider,
+      username,
       email,
       password: hashedPassword,
       isVerified: false,
@@ -56,22 +57,16 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password!" });
     }
 
-    // Generate JWT
+    // Generate JWT without expiration
     const payload = {
       user: {
         id: user.id,
       },
     };
 
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
+    const token = jwt.sign(payload, process.env.JWT_SECRET);
+
+    res.json({ token });
   } catch (error) {
     res.status(400).json({ error: "Login failed!" });
   }

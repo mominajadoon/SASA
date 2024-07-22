@@ -10,3 +10,6 @@ const customizationRequestSchema = new mongoose.Schema({
     default: "Pending",
   },
 });
+const Custom = mongoose.model("Custom", customizationRequestSchema);
+
+module.exports = Custom;
