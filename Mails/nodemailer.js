@@ -108,4 +108,85 @@ const generateOtpEmailHtml = (otp) => `
 </html>
 `;
 
-module.exports = sendEmailOtp;
+const sendResetPasswordEmail = async (email, token) => {
+  const resetUrl = `http://localhost:3000/reset-password?token=${token}`;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.SMTP_EMAIL,
+      pass: process.env.SMTP_PASSWORD,
+    },
+  });
+
+  try {
+    const options = {
+      from: process.env.SMTP_EMAIL,
+      to: email,
+      subject: "Password Reset Request",
+      html: generateResetPasswordEmailHtml(resetUrl),
+    };
+
+    await transporter.sendMail(options);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const generateResetPasswordEmailHtml = (resetUrl) => `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reset your password</title>
+    <style>
+      body {
+        background-color: #f6f9fc;
+        padding: 10px 0;
+      }
+      .container {
+        background-color: #ffffff;
+        border: 1px solid #f0f0f0;
+        padding: 45px;
+      }
+      .text {
+        font-size: 16px;
+        font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light',
+          'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
+        font-weight: 300;
+        color: #404040;
+        line-height: 26px;
+      }
+      .reset-button {
+        background-color: #007ee6;
+        border-radius: 4px;
+        color: #fff;
+        font-family: 'Open Sans', 'Helvetica Neue', Arial;
+        font-size: 18px;
+        text-decoration: none;
+        text-align: center;
+        display: block;
+        width: 100%;
+        padding: 14px 7px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div>
+        <p class="text">Hi,</p>
+        <p class="text">
+          You requested to reset your password. Click the button below to reset it:
+        </p>
+        <a class="reset-button" href="${resetUrl}">Reset Password</a>
+        <p class="text">
+          If you didn't request this, please ignore this email.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
+`;
+
+module.exports = { sendEmailOtp, sendResetPasswordEmail };
