@@ -6,6 +6,13 @@ const authMiddleware = require("../Middleware/authMiddleware");
 // Create a new project
 router.post("/create", authMiddleware, projectController.createProject);
 
+// Delete a project route
+router.delete(
+  "/deleteProject",
+  // authMiddleware,
+  projectController.deleteProject
+);
+
 // Get all projects for the authenticated user
 router.get("/", authMiddleware, projectController.getProjects);
 

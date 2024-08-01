@@ -3,8 +3,9 @@
 const express = require("express");
 const router = express.Router();
 const productController = require("../Controllers/productController");
+const upload = require("../utils/multerConfig");
 
-router.post("/create", productController.createProduct);
+router.post("/create",upload, productController.createProduct);
 router.get("/", productController.getProducts);
 router.get("/:id", productController.getProductById);
 router.put("/update/:id", productController.updateProduct);

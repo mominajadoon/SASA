@@ -59,11 +59,7 @@ exports.login = async (req, res) => {
     }
 
     // Generate JWT without expiration
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
+    const payload = { id: user._id };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET);
 
