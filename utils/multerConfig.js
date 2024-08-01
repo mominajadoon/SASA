@@ -16,7 +16,7 @@ const storage = multerS3({
     cb(null, fileName);
   },
 });
-
+// updatd
 const upload = multer({
   storage: storage,
   // No limits property here means no file size limit
