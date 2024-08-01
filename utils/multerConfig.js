@@ -16,14 +16,10 @@ const storage = multerS3({
     cb(null, fileName);
   },
 });
-// updatd
+
 const upload = multer({
   storage: storage,
   // No limits property here means no file size limit
-}).fields([
-  { name: "profilePicture", maxCount: 1 },
-  { name: "coverPicture", maxCount: 1 },
-  { name: "gallery", maxCount: 10 },
-]);
+}).fields([{ name: "pictures", maxCount: 10 }]);
 
 module.exports = upload;
