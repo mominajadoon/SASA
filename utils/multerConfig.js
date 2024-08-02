@@ -4,12 +4,21 @@ const path = require("path");
 
 const s3 = require("../utils/awsConfig");
 
-// Define storage for each field if necessary
+if (!s3) {
+  console.error("S3 configuration is missing or incorrect.");
+  process.exit(1);
+}
+
+if (!process.env.S3_BUCKET_NAME) {
+  console.error("S3_BUCKET_NAME is not set in the environment variables.");
+  process.exit(1);
+}
+
 const storage = multerS3({
   s3,
   acl: "public-read",
   bucket: process.env.S3_BUCKET_NAME,
-  key: function (req, file, cb) {
+  key: function(req, file, cb) {
     const fileName = `${Date.now()}_${Math.round(
       Math.random() * 1e9
     )}${path.extname(file.originalname)}`;
