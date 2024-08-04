@@ -1,5 +1,3 @@
-// models/Product.js
-
 const mongoose = require("mongoose");
 
 const ProductSchema = new mongoose.Schema({
@@ -27,7 +25,7 @@ const ProductSchema = new mongoose.Schema({
   customizationRequests: [
     { type: mongoose.Schema.Types.ObjectId, ref: "CustomizationRequest" },
   ],
-  projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }], // Added field
+  projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }],
 });
 
 module.exports = mongoose.model("Product", ProductSchema);

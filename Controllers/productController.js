@@ -1,19 +1,70 @@
 // controllers/productController.js
 
 const Product = require("../Models/product");
+const Room = require("../Models/rooms");
 const CustomizationRequest = require("../Models/customizationrequest");
 
 // Create a new product
 exports.createProduct = async (req, res) => {
   try {
-    const newProduct = new Product(req.body);
+    const {
+      roomId,
+      name,
+      price,
+      discountedPrice,
+      itemCode,
+      productionTime,
+      category,
+      brand,
+      size,
+      materials,
+      color,
+      roomType,
+      styles,
+      description,
+      customization,
+      customizationRequests,
+      projects,
+    } = req.body;
+
+    // Extract the S3 URLs of the uploaded images
+    const pictures = req.files.pictures.map((file) => file.location);
+
+    const newProduct = new Product({
+      pictures,
+      name,
+      price,
+      discountedPrice,
+      itemCode,
+      productionTime,
+      category,
+      brand,
+      size,
+      materials,
+      color,
+      roomType,
+      styles,
+      description,
+      customization,
+      customizationRequests,
+      projects,
+    });
+
     await newProduct.save();
+
+    // Add the product reference to the specified room
+    const room = await Room.findById(roomId);
+    if (!room) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+    room.products.push(newProduct._id);
+    await room.save();
+
     res.status(201).json(newProduct);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
-
 // Get all products
 exports.getProducts = async (req, res) => {
   try {
