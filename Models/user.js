@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
   provider: { type: String, required: true, enum: ["credentials", "google"] },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
 });
 
 module.exports = mongoose.model("User", userSchema);

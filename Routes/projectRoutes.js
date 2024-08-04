@@ -17,11 +17,7 @@ router.delete(
 router.get("/", authMiddleware, projectController.getProjects);
 
 // Add a room to a project
-router.post(
-  "/:projectId/rooms",
-  authMiddleware,
-  projectController.addRoomToProject
-);
+router.post("/rooms", authMiddleware, projectController.addRoomToProject);
 
 // Add a product to a room
 router.post(

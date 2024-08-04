@@ -1,8 +1,8 @@
 const Project = require("../Models/project");
 const Room = require("../Models/rooms");
 const Product = require("../Models/product");
-
-// Create a new project
+const mongoose = require("mongoose");
+const ProjectHistory = require("../Models/projectHistory");
 
 // Create a new project
 exports.createProject = async (req, res) => {
@@ -21,9 +21,22 @@ exports.createProject = async (req, res) => {
 // Get all projects for a user
 exports.getProjects = async (req, res) => {
   try {
+    // console.log("Authenticated User:", req.user);
+
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
     const projects = await Project.find({ userId: req.user.id }).populate(
       "rooms products"
     );
+
+    // console.log("Queried Projects:", projects);
+
+    if (projects.length === 0) {
+      return res.status(404).json({ message: "No projects found" });
+    }
+
     res.status(200).json(projects);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -32,16 +45,30 @@ exports.getProjects = async (req, res) => {
 
 // Add a room to a project
 exports.addRoomToProject = async (req, res) => {
-  const { projectId } = req.params;
-  const { name } = req.body;
+  const { projectId, name } = req.body;
+
+  if (!projectId || !name) {
+    return res
+      .status(400)
+      .json({ error: "Please provide both projectId and room name." });
+  }
+
   try {
+    // Create a new Room with the given name and projectId
     const room = new Room({
       name,
       projectId,
     });
     await room.save();
 
+    // Find the project by its ID
     const project = await Project.findById(projectId);
+
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    // Add the room's ID to the project's rooms array
     project.rooms.push(room._id);
     await project.save();
 
@@ -87,27 +114,33 @@ exports.deleteProject = async (req, res) => {
   const { projectId } = req.body;
 
   try {
-    // Find the project by ID and delete it
-    const project = await Project.findByIdAndDelete(projectId);
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ error: "Invalid project ID format" });
+    }
 
-    // If the project doesn't exist, return a 404 error
+    const project = await Project.findById(projectId);
+
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    // Remove all associated rooms with the projectId
+    const projectHistory = new ProjectHistory({
+      ...project.toObject(),
+      deletedAt: new Date(), // Add deletion timestamp
+    });
+    await projectHistory.save();
+
+    await Project.findByIdAndDelete(projectId);
+
     await Room.deleteMany({ projectId: projectId });
 
-    // Remove the project reference from all associated products
     await Product.updateMany(
       { projects: projectId },
       { $pull: { projects: projectId } }
     );
 
-    // Return a success response
     res.status(200).json({ message: "Project deleted successfully" });
   } catch (err) {
-    // If there's an error, return a 400 status with the error message
     res.status(400).json({ error: err.message });
   }
 };

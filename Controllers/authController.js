@@ -47,28 +47,33 @@ exports.login = async (req, res) => {
   try {
     const user = await User.findOne({ email });
 
+    if (!user) {
+      return res.status(401).json({ error: "Invalid email or password!" });
+    }
+
     if (!user.isVerified) {
       await sendEmailOtp(email);
-      res
+      return res
         .status(200)
         .json({ message: "Email not verified! OTP sent to email." });
     }
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Invalid email or password!" });
     }
 
-    // Generate JWT without expiration
-    const payload = { id: user._id };
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET);
+    // Generate JWT with expiration
+    const payload = { user: { id: user._id, email: user.email } };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     res.json({ token });
   } catch (error) {
-    res.status(400).json({ error: "Login failed!" });
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Login failed! Please try again." });
   }
 };
-
 exports.verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
 

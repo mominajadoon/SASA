@@ -7,9 +7,9 @@ const upload = require("../utils/multerConfig");
 
 router.post("/create", upload, productController.createProduct);
 router.get("/", productController.getProducts);
-router.get("/:id", productController.getProductById);
-router.put("/update/:id", productController.updateProduct);
-router.delete("/:id", productController.deleteProduct);
+router.get("/getProductById", productController.getProductById);
+router.put("/update", productController.updateProduct);
+router.delete("/delete", productController.deleteProduct);
 
 // Add product to project
 router.post(
@@ -22,5 +22,11 @@ router.post(
   "/products/:productId/customization",
   productController.submitCustomizationRequest
 );
+
+// Add a product to favorites
+router.post("/favorites", productController.addToFavorites);
+
+// Remove a product from favorites
+router.delete("/removefavorites", productController.removeFromFavorites);
 
 module.exports = router;
