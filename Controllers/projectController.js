@@ -144,3 +144,26 @@ exports.deleteProject = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+// Get a single project by ID
+exports.getProjectById = async (req, res) => {
+  const { projectId } = req.body;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ error: "Invalid project ID format" });
+    }
+
+    const project = await Project.findById(projectId).populate(
+      "rooms products"
+    );
+
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    res.status(200).json(project);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
